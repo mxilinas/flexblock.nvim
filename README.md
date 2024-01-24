@@ -16,7 +16,7 @@
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
-'''lua
+```lua
 return {
     "mxilinas/flexblock.nvim",
     config = function()
@@ -25,4 +25,4 @@ return {
         end)
     end,
 }
-'''
+```
