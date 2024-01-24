@@ -14,7 +14,7 @@
 
 ## Installation
 
-### [lazy.nvim][https://github.com/folke/lazy.nvim]
+### ![lazy.nvim][https://github.com/folke/lazy.nvim]
 
     return {
         "mxilinas/flexblock.nvim",
