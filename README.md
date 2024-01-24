@@ -16,11 +16,13 @@
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
-    return {
-        "mxilinas/flexblock.nvim",
-        config = function()
-            vim.keymap.set("n", "<Leader>fl", function()
-                require("flexblock").flex()
-            end)
-        end,
-    }
+'''lua
+return {
+    "mxilinas/flexblock.nvim",
+    config = function()
+        vim.keymap.set("n", "<Leader>fl", function()
+            require("flexblock").flex()
+        end)
+    end,
+}
+'''
