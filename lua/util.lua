@@ -9,7 +9,7 @@ function M.insert_lines(first_row, last_row, lines)
 	vim.api.nvim_win_set_cursor(0, { first_row, 0 })
 end
 
---- Return the lines from the given range in the current buffer.
+--- Return the line(s) in the given row-range.
 --- @param first_row integer
 --- @param last_row integer
 --- @return table
@@ -17,7 +17,7 @@ function M.get_lines(first_row, last_row)
 	return vim.api.nvim_buf_get_lines(0, first_row - 1, last_row, true)
 end
 
---- Return the lines of the current visual selection and its start/end rows.
+--- Return the row-range of the current visual selection.
 --- @return integer, integer
 function M.get_selection()
 	local first_row = vim.api.nvim_buf_get_mark(0, "<")[1]
@@ -37,7 +37,13 @@ function M.getchar()
 	return line:sub(i, i)
 end
 
---- Visually select the block under the cursor.
+local function clear_visual_selection()
+	vim.api.nvim_buf_set_mark(0, "<", 0, 0, {})
+	vim.api.nvim_buf_set_mark(0, ">", 0, 0, {})
+end
+
+--- Visually select the block at the cursor.
+--- Moves the cursor to the closing bracket.
 function M.select_block()
 	local blocktype = M.getchar()
 	local input = string.format("va%s<Esc>", blocktype)
@@ -65,5 +71,13 @@ assert(M.is_brace("]") == true)
 function M.whitespace(str)
 	return not not string.match(str, "^%s*$")
 end
+
+function M.remove_surrounding_whitespace(str)
+	return string.match(str, "^%s*(.-)%s*$")
+end
+assert(M.remove_surrounding_whitespace("  Hello!   ") == "Hello!")
+assert(M.remove_surrounding_whitespace("  [1, 3]!   ") == "[1, 3]!")
+assert(M.remove_surrounding_whitespace(" [1, 3]!   ") == "[1, 3]!")
+assert(M.remove_surrounding_whitespace("     [1, 3]!   ") == "[1, 3]!")
 
 return M

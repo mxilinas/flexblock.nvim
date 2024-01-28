@@ -15,43 +15,71 @@ local function decompress(line, blocktype, shiftwidth)
 
 	local start, stop = string.find(line, patterns[blocktype])
 
-	if start == nil or stop == nil then
-		error("Could, not, find, block!")
-	end
+	local first = string.sub(line, 1, start)
+	local list = string.sub(line, start + 1, stop)
+	local last = string.sub(line, stop)
 
-	local pre = string.sub(line, 0, start)
-	local offset_block = string.sub(line, start + 1, stop + 1)
-	local post = string.sub(line, stop)
-	table.insert(lines, pre)
+	table.insert(lines, first)
 
 	local leading_spaces = string.match(line, "^%s*")
 	local indent = leading_spaces .. string.rep(" ", shiftwidth)
 
-	local element = ""
 	local nesting_level = 0
-	for char in string.gmatch(offset_block, ".") do
-		if string.match(char, "[,%s%]%)]") and nesting_level == 0 then
-			if not util.whitespace(char) then
-				if string.sub(element, -1) ~= "," then
-					element = element .. ","
+	local element = ""
+	for char in string.gmatch(list, ".") do
+		element = element .. char
+		if nesting_level == 0 then
+			if string.sub(element, -2) == ", " then
+				table.insert(lines, indent .. util.remove_surrounding_whitespace(element))
+				element = ""
+			elseif string.match(string.sub(element, -1), "[%]%}%)]") then
+				if string.len(element) ~= 1 then
+					table.insert(lines, indent .. util.remove_surrounding_whitespace(string.sub(element, 1, -2)) .. ",")
 				end
-				table.insert(lines, indent .. element)
+				element = ""
 			end
-			element = ""
-		else
-			element = element .. char
 		end
 
-		if string.match(char, "[%])}]") then
+		if string.match(char, "[%[%(%{]") then
 			nesting_level = nesting_level + 1
-		elseif string.match(char, "[%[({]") then
+		elseif string.match(char, "[%]%)%}]") then
 			nesting_level = nesting_level - 1
 		end
 	end
 
-	table.insert(lines, leading_spaces .. post)
+	table.insert(lines, leading_spaces .. last)
 
 	return lines
 end
+
+local function test(result)
+	for i = 1, #result, 1 do
+		print(result[i])
+	end
+end
+
+print("no elements")
+test(decompress("{}", "}", 4))
+test(decompress("()", ")", 4))
+test(decompress("[]", "]", 4))
+
+print()
+print("one element")
+test(decompress("{a}", "}", 4))
+test(decompress("(a)", ")", 4))
+test(decompress("[a]", "]", 4))
+
+print()
+print("three elements")
+test(decompress("{ a, b, c }", "}", 4))
+test(decompress("(a, b, c)", ")", 4))
+test(decompress("[a, b, c]", "]", 4))
+
+test(decompress("{ 1, 2, 3, 4 }", "}", 4))
+
+print()
+print("Multi-dimensional")
+test(decompress("{ { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } }", "}", 4))
+test(decompress("[[1, 2, 3], [4, 5, 6], [7, 8, 9]]", "]", 4))
 
 return decompress
