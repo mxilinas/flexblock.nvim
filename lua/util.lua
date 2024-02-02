@@ -68,16 +68,16 @@ assert(M.is_brace("]") == true)
 --- True if the given string is all whitespace.
 --- @param str string
 --- @return boolean
-function M.whitespace(str)
+function M.is_whitespace(str)
 	return not not string.match(str, "^%s*$")
 end
 
-function M.remove_surrounding_whitespace(str)
+function M.rm_whitespace(str)
 	return string.match(str, "^%s*(.-)%s*$")
 end
-assert(M.remove_surrounding_whitespace("  Hello!   ") == "Hello!")
-assert(M.remove_surrounding_whitespace("  [1, 3]!   ") == "[1, 3]!")
-assert(M.remove_surrounding_whitespace(" [1, 3]!   ") == "[1, 3]!")
-assert(M.remove_surrounding_whitespace("     [1, 3]!   ") == "[1, 3]!")
+assert(M.rm_whitespace("  Hello!   ") == "Hello!")
+assert(M.rm_whitespace("  [1, 3]!   ") == "[1, 3]!")
+assert(M.rm_whitespace(" [1, 3]!   ") == "[1, 3]!")
+assert(M.rm_whitespace("     [1, 3]!   ") == "[1, 3]!")
 
 return M
